@@ -46,12 +46,10 @@ namespace Awesome.Library.ActiveDirectory {
 
 		public UserAccount( UserPrincipal up ) {
 			this.SID = up.Sid.Value;
-			if ( String.IsNullOrEmpty( up.UserPrincipalName ) == false ) {
-				this.UserName = up.UserPrincipalName;
-			} else if ( String.IsNullOrEmpty( up.SamAccountName ) == false ) {
+			if ( String.IsNullOrEmpty( up.SamAccountName ) == false ) {
 				this.UserName = up.SamAccountName;
-			} else {
-				this.UserName = up.Name;
+			} else if ( String.IsNullOrEmpty( up.UserPrincipalName ) == false ) {
+				this.UserName = up.UserPrincipalName;
 			}
 			if ( this.UserName != null ) {
 				this.UserName = this.UserName.ToLower();
@@ -60,13 +58,20 @@ namespace Awesome.Library.ActiveDirectory {
 			this.EmailAddress = ( up.EmailAddress != null ? up.EmailAddress.ToLower() : null );
 			this.FirstName = up.GivenName.Capitilize();
 			this.LastName = up.Surname.Capitilize();
-			this.Company = DirectoryContext.GetProperty<string>( up, "company" );
-			this.Department = DirectoryContext.GetProperty<string>( up, "department" );
-			this.Title = DirectoryContext.GetProperty<string>( up, "title" );
-			Stream photoStream = DirectoryContext.GetPropertyStream( up, "jpegPhoto" );
-			if ( photoStream != null ) {
-				this.Photo = Image.FromStream( photoStream );
-			}
+			this.Company = DirectoryContext.GetPropertyValue<string>( up, "company" );
+			this.Department = DirectoryContext.GetPropertyValue<string>( up, "department" );
+			this.Title = DirectoryContext.GetPropertyValue<string>( up, "title" );
+			//retrieve photo
+			using ( PrincipalSearcher principalSearcher = new PrincipalSearcher() ) {
+				principalSearcher.QueryFilter = new UserPrincipal( up.Context ) { SamAccountName = up.SamAccountName };
+				Principal principal = principalSearcher.FindOne();
+				if ( principal != null ) {
+					Stream photoStream = DirectoryContext.GetPropertyStream( principal, "thumbnailPhoto" );
+					if ( photoStream != null ) {
+						this.Photo = Image.FromStream( photoStream );
+					}
+				}
+			}		
 		}
 
 		#endregion

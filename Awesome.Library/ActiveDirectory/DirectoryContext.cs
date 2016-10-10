@@ -37,43 +37,67 @@ namespace Awesome.Library.ActiveDirectory {
 			this.Process = new ProcessPrincipal( pc, pident );
 		}
 
+		public DirectoryContext( ContextType ct, string name, string userName, string password ) {
+			PrincipalContext pc = new PrincipalContext( ct, name, userName, password );
+			WindowsIdentity pident = WindowsIdentity.GetCurrent();
+			this.Process = new ProcessPrincipal( pc, pident );
+		}
+
+		public DirectoryContext( string domain, string userName, string password )
+			: this( ContextType.Domain, domain, userName, password ) { }
+
 		#endregion
 
 		#region " Methods "
 
-		public UserAccount GetWebUser() {
-			string userName = null;
+		public UserAccount GetUser( string userName ) {
 			UserAccount user = null;
+			if ( String.IsNullOrEmpty( userName ) == false ) {
+				UserPrincipal up = UserPrincipal.FindByIdentity( this.Process.PrincipalContext, userName );
+				if ( up != null ) {
+					user = new UserAccount( up );
+				}
+			}
+			return user;
+		}
+
+		public UserAccount GetWebUser() {
 			if ( HttpContext.Current != null
 				&& HttpContext.Current.User.Identity != null
 				&& HttpContext.Current.User.Identity.IsAuthenticated ) {
-				userName = HttpContext.Current.User.Identity.Name;
-				UserPrincipal up = UserPrincipal.FindByIdentity( this.Process.PrincipalContext, userName );
-				user = new UserAccount( up );
+				return this.GetUser( HttpContext.Current.User.Identity.Name );
 			}
-			return user;
+			return null;
 		}
 
 		#endregion
 
 		#region " Static Methods "
 
-		public static T GetProperty<T>( Principal p, string property ) {
-			DirectoryEntry de = p.GetUnderlyingObject() as DirectoryEntry;
-			if ( de.Properties.Contains( property ) ) {
-				return (T)de.Properties[property].Value;
+		public static T GetPropertyValue<T>( Principal p, string property ) {
+			object value = DirectoryContext.GetPropertyValue( p, property );
+			if ( value != null ) {
+				return (T)value;
 			}
 			return default( T );
 		}
 
-		public static MemoryStream GetPropertyStream( Principal p, string property ) {
+		public static object GetPropertyValue( Principal p, string property ) {
 			DirectoryEntry de = p.GetUnderlyingObject() as DirectoryEntry;
 			if ( de.Properties.Contains( property ) ) {
-				if ( de.Properties[property].Value is byte[] ) {
-					return new MemoryStream( de.Properties[property].Value as byte[] );
-				} else if ( de.Properties[property].Value is string) {
-					return new MemoryStream( Encoding.UTF8.GetBytes( de.Properties[property].Value as string ) );
-				}
+				return de.Properties[property].Value;
+			}
+			return null;
+		}
+
+		public static MemoryStream GetPropertyStream( Principal p, string property ) {
+			object value = DirectoryContext.GetPropertyValue( p, property );
+			if ( value is byte[] ) {
+				return new MemoryStream( value as byte[] );
+			} else if ( value is string ) {
+				return new MemoryStream( Encoding.UTF8.GetBytes( value as string ) );
+			} else if ( value != null ) {
+				throw new NotSupportedException( "The directory entry property value is of an unsupported type for streaming." );
 			}
 			return null;
 		}
