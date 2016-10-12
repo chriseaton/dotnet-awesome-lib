@@ -90,7 +90,6 @@
     <Compile Include="Utilities\HtmlPrinter.cs" />
     <Compile Include="Utilities\HttpTransfer.cs" />
     <Compile Include="Utilities\Images.cs" />
-    <Compile Include="Utilities\IWebBrowser2.cs" />
     <Compile Include="Utilities\Numerics.cs" />
     <Compile Include="Utilities\Objects.cs" />
     <Compile Include="Utilities\Resourcer.cs" />

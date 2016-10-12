@@ -706,26 +706,22 @@ namespace Awesome.Library.Utilities {
 		}
 
 		/// <summary>
-		/// Opens the users default web browser to the givent url
+		/// Creates a URL friendly slug string from the given input
 		/// </summary>
-		public static bool OpenBrowserToURL( this string url ) {
-			if ( url.Validate( StringForm.URL ) ) {
-				string path = Execution.GetDefaultBrowserPath();
-				try {
-					if ( File.Exists( path ) ) {
-						Process p = new Process();
-						p.StartInfo.FileName = Execution.GetDefaultBrowserPath();
-						p.StartInfo.Arguments = url;
-						p.Start();
-					} else {
-						System.Diagnostics.Process.Start( url );
-					}
-				} catch {
-					return false;
+		public static string Slugify( string input ) {
+			StringBuilder sb = new StringBuilder();
+			bool space = false;
+			for ( int x = 0; x < input.Length; x++ ) {
+				char c = input[x];
+				if ( Char.IsLetterOrDigit( c ) ) {
+					sb.Append( Char.ToLower( c ) );
+					space = false;
+				} else if ( Char.IsSeparator( c ) && space == false ) {
+					sb.Append( '-' );
+					space = true;
 				}
-				return true;
 			}
-			return false;
+			return sb.ToString().Trim( '-' );
 		}
 
 		/// <summary>
