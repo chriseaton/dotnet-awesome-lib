@@ -45,6 +45,14 @@ namespace Awesome.Library.ActiveDirectory {
 		public UserAccount() { }
 
 		public UserAccount( UserPrincipal up ) {
+			this.LoadProperties( up );	
+		}
+
+		#endregion
+
+		#region " Methods "
+
+		protected virtual void LoadProperties( UserPrincipal up ) {
 			this.SID = up.Sid.Value;
 			if ( String.IsNullOrEmpty( up.SamAccountName ) == false ) {
 				this.UserName = up.SamAccountName;
@@ -61,22 +69,20 @@ namespace Awesome.Library.ActiveDirectory {
 			this.Company = DirectoryContext.GetPropertyValue<string>( up, "company" );
 			this.Department = DirectoryContext.GetPropertyValue<string>( up, "department" );
 			this.Title = DirectoryContext.GetPropertyValue<string>( up, "title" );
-			//retrieve photo
-			using ( PrincipalSearcher principalSearcher = new PrincipalSearcher() ) {
-				principalSearcher.QueryFilter = new UserPrincipal( up.Context ) { SamAccountName = up.SamAccountName };
-				Principal principal = principalSearcher.FindOne();
-				if ( principal != null ) {
-					Stream photoStream = DirectoryContext.GetPropertyStream( principal, "thumbnailPhoto" );
-					if ( photoStream != null ) {
-						this.Photo = Image.FromStream( photoStream );
-					}
-				}
-			}		
+			this.Photo = this.RetrievePhoto( up );
 		}
 
-		#endregion
-
-		#region " Methods "
+		protected Image RetrievePhoto( UserPrincipal up ) {
+			object photoBytes = DirectoryContext.SearchUser( up, up.SamAccountName, "thumbnailPhoto" );
+			if ( photoBytes == null ) {
+				photoBytes = DirectoryContext.SearchUser( up, up.SamAccountName, "jpegPhoto" );
+			}
+			if ( photoBytes != null && photoBytes is byte[] ) {
+				MemoryStream ms = new MemoryStream( (byte[])photoBytes );
+				return Image.FromStream( ms );
+			}
+			return null;
+		}
 
 		#endregion
 

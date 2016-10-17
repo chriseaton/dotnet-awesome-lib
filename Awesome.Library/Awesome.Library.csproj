@@ -83,6 +83,7 @@
     <Compile Include="Utilities\AssemblyExtensions.cs" />
     <Compile Include="Utilities\CreditCards.cs" />
     <Compile Include="Utilities\DataGridViewPrinter.cs" />
+    <Compile Include="Utilities\DataReader.cs" />
     <Compile Include="Utilities\DriveInfo.cs" />
     <Compile Include="Utilities\Enumerables.cs" />
     <Compile Include="Utilities\Execution.cs" />

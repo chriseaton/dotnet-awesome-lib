@@ -70,12 +70,12 @@ namespace Awesome.Library.Utilities {
 
 	public static class Strings {
 
-		private static readonly string[] GoodHtmlTags = new string[] { 
-			"p", "b", "i", "ul", "u", "em", "address", "span", "blockquote", "pre", "br", "hr", 
+		private static readonly string[] GoodHtmlTags = new string[] {
+			"p", "b", "i", "ul", "u", "em", "address", "span", "blockquote", "pre", "br", "hr",
 			"ol", "li", "strong", "a", "h1", "h2","h3","h4","h5","h6", "sub", "sup", "font"
 		};
 
-		private static readonly string[] GoodAttributes = new string[] { 
+		private static readonly string[] GoodAttributes = new string[] {
 			"style", "href", "target", "border", "align", "title", "size", "color"
 		};
 
@@ -224,14 +224,21 @@ namespace Awesome.Library.Utilities {
 		/// Generates random text with the random amount of specified chars
 		/// </summary>
 		public static string CreateRandom( int minChars, int maxChars ) {
+			Random r = new Random();
+			return CreateRandom( r, minChars, maxChars );
+		}
+
+		/// <summary>
+		/// Generates random text with the random amount of specified chars
+		/// </summary>
+		public static string CreateRandom( Random rand, int minChars, int maxChars ) {
 			// Generate random text
 			string s = "";
 			char[] chars = "acdefijkqrstuxyzABCDEFGHJKLNPQRSTUXYZ23456789".ToCharArray();
 			int index;
-			Random r = new Random();
-			int length = r.Next( minChars, maxChars );
+			int length = rand.Next( minChars, maxChars );
 			for ( int i = 0; i < length; i++ ) {
-				index = r.Next( chars.Length - 1 );
+				index = rand.Next( chars.Length - 1 );
 				s += chars[index].ToString();
 			}
 			return s;
@@ -716,7 +723,7 @@ namespace Awesome.Library.Utilities {
 				if ( Char.IsLetterOrDigit( c ) ) {
 					sb.Append( Char.ToLower( c ) );
 					space = false;
-				} else if ( Char.IsSeparator( c ) && space == false ) {
+				} else if ( ( Char.IsSeparator( c ) || c == '@' || c == '.' || c == ';' || c == ':' ) && space == false ) {
 					sb.Append( '-' );
 					space = true;
 				}
@@ -924,21 +931,43 @@ namespace Awesome.Library.Utilities {
 							str = ToDouble( temp ).ToString( Formats.PhoneNumberShort );
 						}
 						break;
-					case StringConversion.Number: str = ToDecimal( str ).ToString(); break;
-					case StringConversion.NumberNoDecimals: str = ToDecimal( str ).ToString( "N0" ); break;
-					case StringConversion.NumberOneDecimal: str = ToDecimal( str ).ToString( "N1" ); break;
-					case StringConversion.NumberTwoDecimals: str = ToDecimal( str ).ToString( "N2" ); break;
-					case StringConversion.NumberThreeDecimals: str = ToDecimal( str ).ToString( "N3" ); break;
-					case StringConversion.NumberFourDecimals: str = ToDecimal( str ).ToString( "N4" ); break;
+					case StringConversion.Number:
+						str = ToDecimal( str ).ToString();
+						break;
+					case StringConversion.NumberNoDecimals:
+						str = ToDecimal( str ).ToString( "N0" );
+						break;
+					case StringConversion.NumberOneDecimal:
+						str = ToDecimal( str ).ToString( "N1" );
+						break;
+					case StringConversion.NumberTwoDecimals:
+						str = ToDecimal( str ).ToString( "N2" );
+						break;
+					case StringConversion.NumberThreeDecimals:
+						str = ToDecimal( str ).ToString( "N3" );
+						break;
+					case StringConversion.NumberFourDecimals:
+						str = ToDecimal( str ).ToString( "N4" );
+						break;
 					case StringConversion.URL:
 						if ( str.ToLower().Trim().StartsWith( "http://" ) == false )
 							str = "http://" + str;
 						break;
-					case StringConversion.YesNo: str = ( strAsBool ) ? "Yes" : "No"; break;
-					case StringConversion.OnOff: str = ( strAsBool ) ? "On" : "Off"; break;
-					case StringConversion.AllowedDenied: str = ( strAsBool ) ? "Allowed" : "Denied"; break;
-					case StringConversion.URLEncode: str = System.Web.HttpUtility.UrlEncode( str ); break;
-					case StringConversion.URLDecode: str = System.Web.HttpUtility.UrlDecode( str ); break;
+					case StringConversion.YesNo:
+						str = ( strAsBool ) ? "Yes" : "No";
+						break;
+					case StringConversion.OnOff:
+						str = ( strAsBool ) ? "On" : "Off";
+						break;
+					case StringConversion.AllowedDenied:
+						str = ( strAsBool ) ? "Allowed" : "Denied";
+						break;
+					case StringConversion.URLEncode:
+						str = System.Web.HttpUtility.UrlEncode( str );
+						break;
+					case StringConversion.URLDecode:
+						str = System.Web.HttpUtility.UrlDecode( str );
+						break;
 					case StringConversion.HtmlCharacterCodes:
 						StringBuilder sb = new StringBuilder();
 						for ( int x = 0; x < str.Length; x++ ) {
@@ -968,26 +997,48 @@ namespace Awesome.Library.Utilities {
 		public static string Perform( this string str, StringOp operation ) {
 			if ( str != null ) {
 				switch ( operation ) {
-					case StringOp.AllowOnlyAlpha: str = Regex.Replace( str, "[^A-z]", "" ).Replace( "_", "" ); break;
-					case StringOp.AllowOnlyAlphaNumeric: str = Regex.Replace( str, "[^A-z0-9]", "" ).Replace( "_", "" ); break;
-					case StringOp.AllowOnlyNumbers: str = Regex.Replace( str, "[^0-9]", "" ); break;
+					case StringOp.AllowOnlyAlpha:
+						str = Regex.Replace( str, "[^A-z]", "" ).Replace( "_", "" );
+						break;
+					case StringOp.AllowOnlyAlphaNumeric:
+						str = Regex.Replace( str, "[^A-z0-9]", "" ).Replace( "_", "" );
+						break;
+					case StringOp.AllowOnlyNumbers:
+						str = Regex.Replace( str, "[^0-9]", "" );
+						break;
 					case StringOp.AllowOnlyNumeric:
 						str = Regex.Replace( str, @"[^0-9.\-'('')']", "" );
 						if ( str.Contains( "(" ) && str.Contains( ")" ) ) //negative parenthesis
 							str = str.Insert( 0, "-" );
 						str = str.Replace( "(", "" ).Replace( ")", "" );
 						break;
-					case StringOp.AllowOnlySpecial: str = Regex.Replace( str, "[^\\W]", "" ); break;
+					case StringOp.AllowOnlySpecial:
+						str = Regex.Replace( str, "[^\\W]", "" );
+						break;
 					case StringOp.AllowOnlyGoodHTML:
 						str = Regex.Replace( str, @"</?(((?!" + Strings.ListValues( GoodHtmlTags, "|" ) + @"|/)[^>]*))*>", "" );
 						break;
-					case StringOp.StripAlpha: str = Regex.Replace( str, "[A-z]", "" ); break;
-					case StringOp.StripNumbers: str = Regex.Replace( str, "[0-9]", "" ); break;
-					case StringOp.StripQuotes: str = str.Replace( "\"", "" ).Replace( "'", "" ); break;
-					case StringOp.StripSpecial: str = Regex.Replace( str, "[\\W]", "" ); break;
-					case StringOp.StripWhiteSpace: str = str.Replace( " ", "" ).Replace( "\t", "" ); break;
-					case StringOp.UnMnemonic: str = str.Replace( "&", "&&" ); break;
-					case StringOp.StripHTML: str = Regex.Replace( str, @"<(.|\n)*?>", string.Empty ); break;
+					case StringOp.StripAlpha:
+						str = Regex.Replace( str, "[A-z]", "" );
+						break;
+					case StringOp.StripNumbers:
+						str = Regex.Replace( str, "[0-9]", "" );
+						break;
+					case StringOp.StripQuotes:
+						str = str.Replace( "\"", "" ).Replace( "'", "" );
+						break;
+					case StringOp.StripSpecial:
+						str = Regex.Replace( str, "[\\W]", "" );
+						break;
+					case StringOp.StripWhiteSpace:
+						str = str.Replace( " ", "" ).Replace( "\t", "" );
+						break;
+					case StringOp.UnMnemonic:
+						str = str.Replace( "&", "&&" );
+						break;
+					case StringOp.StripHTML:
+						str = Regex.Replace( str, @"<(.|\n)*?>", string.Empty );
+						break;
 				}
 			}
 			return str;
@@ -1044,7 +1095,7 @@ namespace Awesome.Library.Utilities {
 		/// </summary>
 		public static RectangleF ToRectangleF( this string str ) {
 			if ( str != null ) {
-				if ( str.ToLower() == "empty" || str.ToLower() == "0" || String.IsNullOrEmpty(str)==false )
+				if ( str.ToLower() == "empty" || str.ToLower() == "0" || String.IsNullOrEmpty( str ) == false )
 					return RectangleF.Empty;
 				str = str.Perform( StringOp.StripAlpha );
 				string[] parts = str.Split( ',' );
@@ -1081,7 +1132,7 @@ namespace Awesome.Library.Utilities {
 		/// Returns an int32 from a string (potentially nullable)
 		/// </summary>
 		public static int? ToNullableInt32( this string str ) {
-			if ( String.IsNullOrEmpty( str )  )
+			if ( String.IsNullOrEmpty( str ) )
 				return null;
 			return str.ToInt32();
 		}
@@ -1425,11 +1476,16 @@ namespace Awesome.Library.Utilities {
 						for ( int x = 0; x < str.Length; x++ ) {
 							if ( str[x] != "" ) {
 								bool matchesSkipWord = false;
-								if ( str[x].ToLower() == "and" ) matchesSkipWord = true;
-								if ( str[x].ToLower() == "in" ) matchesSkipWord = true;
-								if ( str[x].ToLower() == "of" ) matchesSkipWord = true;
-								if ( str[x].ToLower() == "vs" ) matchesSkipWord = true;
-								if ( str[x].ToLower() == "n" ) matchesSkipWord = true;
+								if ( str[x].ToLower() == "and" )
+									matchesSkipWord = true;
+								if ( str[x].ToLower() == "in" )
+									matchesSkipWord = true;
+								if ( str[x].ToLower() == "of" )
+									matchesSkipWord = true;
+								if ( str[x].ToLower() == "vs" )
+									matchesSkipWord = true;
+								if ( str[x].ToLower() == "n" )
+									matchesSkipWord = true;
 								if ( ( str[x].Length > 1 ) && ( matchesSkipWord == false ) )
 									str[x] = str[x].Substring( 0, 1 ).ToUpper() + str[x].Substring( 1, str[x].Length - 1 );
 								if ( x != 0 )

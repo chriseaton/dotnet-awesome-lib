@@ -83,21 +83,35 @@ namespace Awesome.Library.ActiveDirectory {
 		}
 
 		public static object GetPropertyValue( Principal p, string property ) {
+			return DirectoryContext.GetPropertyValue( p, property, true );
+		}
+
+		public static object GetPropertyValue( Principal p, string property, bool useCache ) {
 			DirectoryEntry de = p.GetUnderlyingObject() as DirectoryEntry;
+			de.UsePropertyCache = useCache;
 			if ( de.Properties.Contains( property ) ) {
 				return de.Properties[property].Value;
 			}
 			return null;
 		}
 
-		public static MemoryStream GetPropertyStream( Principal p, string property ) {
-			object value = DirectoryContext.GetPropertyValue( p, property );
-			if ( value is byte[] ) {
-				return new MemoryStream( value as byte[] );
-			} else if ( value is string ) {
-				return new MemoryStream( Encoding.UTF8.GetBytes( value as string ) );
-			} else if ( value != null ) {
-				throw new NotSupportedException( "The directory entry property value is of an unsupported type for streaming." );
+		public static object SearchUser( Principal p, string sAMAccountName, string property ) {
+			DirectoryEntry de = p.GetUnderlyingObject() as DirectoryEntry;
+			de.UsePropertyCache = false;
+			DirectorySearcher search = new DirectorySearcher();
+			search.SearchRoot = de;
+			search.Filter = "(&(objectClass=user)(objectCategory=person)(sAMAccountName=" + sAMAccountName + "))";
+			search.PropertiesToLoad.Add( "samaccountname" );
+			search.PropertiesToLoad.Add( property );
+			SearchResult r = search.FindOne();
+			if ( r != null && r.Properties.Contains(property)) {
+				if ( r.Properties[property].Count == 1 ) {
+					return r.Properties[property][0];
+				} else {
+					object[] results = new object[r.Properties[property].Count];
+					r.Properties[property].CopyTo( results, 0 );
+					return results;
+				}
 			}
 			return null;
 		}
