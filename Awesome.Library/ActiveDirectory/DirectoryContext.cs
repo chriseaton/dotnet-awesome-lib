@@ -100,17 +100,21 @@ namespace Awesome.Library.ActiveDirectory {
 			de.UsePropertyCache = false;
 			DirectorySearcher search = new DirectorySearcher();
 			search.SearchRoot = de;
+			search.CacheResults = false;
 			search.Filter = "(&(objectClass=user)(objectCategory=person)(sAMAccountName=" + sAMAccountName + "))";
 			search.PropertiesToLoad.Add( "samaccountname" );
 			search.PropertiesToLoad.Add( property );
-			SearchResult r = search.FindOne();
-			if ( r != null && r.Properties.Contains(property)) {
-				if ( r.Properties[property].Count == 1 ) {
-					return r.Properties[property][0];
-				} else {
-					object[] results = new object[r.Properties[property].Count];
-					r.Properties[property].CopyTo( results, 0 );
-					return results;
+			SearchResultCollection mult = search.FindAll();
+			//SearchResult r = search.FindOne();
+			foreach ( SearchResult r in mult ) {
+				if ( r != null && r.Properties.Contains( property ) ) {
+					if ( r.Properties[property].Count == 1 ) {
+						return r.Properties[property][0];
+					} else {
+						object[] results = new object[r.Properties[property].Count];
+						r.Properties[property].CopyTo( results, 0 );
+						return results;
+					}
 				}
 			}
 			return null;
