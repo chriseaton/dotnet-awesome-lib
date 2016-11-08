@@ -70,6 +70,24 @@ namespace Awesome.Library.ActiveDirectory {
 			return null;
 		}
 
+		public string[] SearchUsers( string partial ) {
+			List<string> userNames = new List<string>();
+			UserPrincipal user = new UserPrincipal( this.Process.PrincipalContext );
+			user.Name = ( partial ?? String.Empty ) + "*"; // builds 'Ja*', which finds names starting with 'Ja'
+			using ( var searcher = new PrincipalSearcher( user ) ) {
+				foreach ( var result in searcher.FindAll() ) {
+					DirectoryEntry de = result.GetUnderlyingObject() as DirectoryEntry;
+					if ( !String.IsNullOrEmpty( (String)de.Properties["samaccountname"].Value ) ) {
+						string un = de.Properties["samaccountname"].Value as string;
+						if ( un != null ) {
+							userNames.Add( un );
+						}
+					}
+				}
+			}
+			return userNames.ToArray();
+		}
+
 		#endregion
 
 		#region " Static Methods "
