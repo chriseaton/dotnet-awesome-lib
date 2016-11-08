@@ -72,6 +72,8 @@
     <Compile Include="CacheManager.cs" />
     <Compile Include="DecimalModelBinder.cs" />
     <Compile Include="HtmlHelperExtensions.cs" />
+    <Compile Include="ModelStateDictionaryExtensions.cs" />
+    <Compile Include="ModelStateJsonResult.cs" />
     <Compile Include="MvcSiteMap.cs" />
     <Compile Include="MvcSiteMapNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
