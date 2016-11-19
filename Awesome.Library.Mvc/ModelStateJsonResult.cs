@@ -7,21 +7,27 @@ using System.Threading.Tasks;
 namespace Awesome.Library.Mvc {
 
 	[Serializable()]
-	public class ModelStateJsonResult : Dictionary<string, string[]> {
+	public class ModelStateJsonResult {
 
 		#region " Properties "
 
-		public bool Errors {
-			get { return this.Values.Any( a => a != null && a.Length > 0 ); }
+		public string Message {
+			get { return String.Format( "{0} Error(s) resulted from processing the provided model. See the \"Errors\" property for details.", this.ErrorCount ); }
 		}
+
+		public int ErrorCount {
+			get { return this.Errors.Count; }
+		}
+
+		public Dictionary<string, string[]> Errors { get; set; }
 
 		#endregion
 
 		#region " Constructor(s) "
 
-		public ModelStateJsonResult() : base() { }
-
-		public ModelStateJsonResult( IDictionary<string, string[]> dictionary ) : base( dictionary ) { }
+		public ModelStateJsonResult( Dictionary<string, string[]> errors ) {
+			this.Errors = errors ?? new Dictionary<string, string[]>();
+		}
 
 		#endregion
 

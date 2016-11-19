@@ -12,7 +12,7 @@ namespace Awesome.Library.Mvc {
 		/// Returns a simple string dictionary that lists model keys and errors.
 		/// </summary>
 		public static Dictionary<string, string[]> ToErrorDictionary( this ModelStateDictionary modelState ) {
-			return modelState.ToDictionary(
+			return modelState.Where( a => a.Value != null && a.Value.Errors != null && a.Value.Errors.Count > 0 ).ToDictionary(
 				kvp => kvp.Key,
 				kvp => ( from n in kvp.Value.Errors
 						 where String.IsNullOrWhiteSpace( n.ErrorMessage ) == false
@@ -23,13 +23,8 @@ namespace Awesome.Library.Mvc {
 		/// <summary>
 		/// Returns a simple string dictionary that lists model keys and errors.
 		/// </summary>
-		public static Dictionary<string, string[]> ToJsonResult( this ModelStateDictionary modelState ) {
-			return new ModelStateJsonResult( modelState.ToDictionary(
-				kvp => kvp.Key,
-				kvp => ( from n in kvp.Value.Errors
-						 where String.IsNullOrWhiteSpace( n.ErrorMessage ) == false
-						 select n.ErrorMessage ).ToArray()
-			) );
+		public static ModelStateJsonResult ToJsonResult( this ModelStateDictionary modelState ) {
+			return new ModelStateJsonResult( ModelStateDictionaryExtensions.ToErrorDictionary( modelState ) );
 		}
 
 	}
