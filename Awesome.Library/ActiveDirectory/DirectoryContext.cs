@@ -71,16 +71,38 @@ namespace Awesome.Library.ActiveDirectory {
 		}
 
 		public string[] SearchUsers( string partial ) {
+			return SearchUsers( partial, true );
+		}
+
+		public string[] SearchUsers( string partial, bool includeDC ) {
 			List<string> userNames = new List<string>();
 			UserPrincipal user = new UserPrincipal( this.Process.PrincipalContext );
 			user.Name = ( partial ?? String.Empty ) + "*"; // builds 'Ja*', which finds names starting with 'Ja'
 			using ( var searcher = new PrincipalSearcher( user ) ) {
 				foreach ( var result in searcher.FindAll() ) {
 					DirectoryEntry de = result.GetUnderlyingObject() as DirectoryEntry;
-					if ( !String.IsNullOrEmpty( (String)de.Properties["samaccountname"].Value ) ) {
+					if ( String.IsNullOrEmpty( de.Properties["samaccountname"].Value as string ) == false ) {
 						string un = de.Properties["samaccountname"].Value as string;
 						if ( un != null ) {
-							userNames.Add( un );
+							//find dc
+							if ( includeDC ) {
+								de = de.Parent;
+								while ( de != null ) {
+									if ( de.SchemaClassName == "domainDNS" ) {
+										int dcNameIndex = de.Name.LastIndexOf( "DC=" );
+										if ( dcNameIndex > -1 ) {
+											un = de.Name.Substring( dcNameIndex + 3 ) + "\\" + un;
+										} else {
+											un = de.Name + "\\" + un;
+										}
+										userNames.Add( un );
+										break;
+									}
+									de = de.Parent;
+								}
+							} else {
+								userNames.Add( un );
+							}
 						}
 					}
 				}

@@ -28,6 +28,14 @@ namespace Awesome.Library.Mvc {
 			}
 		}
 
+		public static DateTime NoAbsoluteExpiration {
+			get { return Cache.NoAbsoluteExpiration; }
+		}
+
+		public static TimeSpan NoSlidingExpiration {
+			get { return Cache.NoSlidingExpiration; }
+		}
+
 		#endregion
 
 		#region " Methods "

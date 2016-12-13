@@ -41,6 +41,10 @@ namespace Awesome.Library.Mvc {
 			}
 		}
 
+		public static object Get( string key ) {
+			return Session[key];
+		}
+
 		public static T Get<T>( string key ) where T : class {
 			if ( Session != null ) {
 				return Session[key] as T;
