@@ -1,7 +1,7 @@
 /********************************************
  * MIT License
  * (c) Christopher Eaton, 2012
- * https://gitlab.com/chriseaton/awesome-lib
+ * https://github.com/chriseaton/dotnet-awesome-lib
  ********************************************/
 using System;
 using System.Text;

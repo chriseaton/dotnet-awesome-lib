@@ -1,7 +1,7 @@
 /********************************************
  * MIT License
  * (c) Christopher Eaton, 2012
- * https://gitlab.com/chriseaton/awesome-lib
+ * https://github.com/chriseaton/dotnet-awesome-lib
  ********************************************/
 using System;
 using System.Text;
@@ -875,11 +875,11 @@ namespace Awesome.Library.Utilities {
 						str = str.Replace( ">", "&gt;" );
 						str = str.Replace( "\"", "&quot;" );
 						str = str.Replace( "'", "&apos;" );
-						str = str.Replace( "©", "&copy;" );
-						str = str.Replace( "™", "&trade;" );
-						str = str.Replace( "®", "&reg;" );
-						str = str.Replace( "±", "&plusmn;" );
-						str = str.Replace( "µ", "&micro;" );
+						str = str.Replace( "ï¿½", "&copy;" );
+						str = str.Replace( "ï¿½", "&trade;" );
+						str = str.Replace( "ï¿½", "&reg;" );
+						str = str.Replace( "ï¿½", "&plusmn;" );
+						str = str.Replace( "ï¿½", "&micro;" );
 						break;
 					case StringConversion.UnEscapeXHTMLText:
 						str = str.Replace( "&amp;", "&" );
@@ -887,11 +887,11 @@ namespace Awesome.Library.Utilities {
 						str = str.Replace( "&gt;", ">" );
 						str = str.Replace( "&quot;", "\"" );
 						str = str.Replace( "&apos;", "'" );
-						str = str.Replace( "&copy;", "©" );
-						str = str.Replace( "&trade;", "™" );
-						str = str.Replace( "&reg;", "®" );
-						str = str.Replace( "&plusmn;", "±" );
-						str = str.Replace( "&micro;", "µ" );
+						str = str.Replace( "&copy;", "ï¿½" );
+						str = str.Replace( "&trade;", "ï¿½" );
+						str = str.Replace( "&reg;", "ï¿½" );
+						str = str.Replace( "&plusmn;", "ï¿½" );
+						str = str.Replace( "&micro;", "ï¿½" );
 						break;
 					case StringConversion.Money:
 						str = ToDecimal( str ).ToString( "C" );

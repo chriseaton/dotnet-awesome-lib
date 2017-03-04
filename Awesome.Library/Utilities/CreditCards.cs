@@ -1,7 +1,7 @@
-﻿/********************************************
+/********************************************
  * MIT License
  * (c) Christopher Eaton, 2012
- * https://gitlab.com/chriseaton/awesome-lib
+ * https://github.com/chriseaton/dotnet-awesome-lib
  ********************************************
  * CODE MODIFIED FROM:  * CODE MODIFIED FROM: http://madskristensen.net/post/A-realtime-currency-exchange-class-in-C.aspx
  * Originally created by: BlueLaser05, 2007
