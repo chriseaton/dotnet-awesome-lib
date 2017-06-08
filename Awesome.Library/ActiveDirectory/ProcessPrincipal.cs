@@ -1,7 +1,7 @@
-/********************************************
+﻿/********************************************
  * MIT License
  * (c) Christopher Eaton, 2012
- * https://github.com/chriseaton/dotnet-awesome-lib
+ * https://gitlab.com/chriseaton/awesome-lib
  ********************************************/
 using System;
 using System.Collections.Generic;
