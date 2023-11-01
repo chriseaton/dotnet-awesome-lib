@@ -37,14 +37,20 @@ namespace Awesome.Library.ActiveDirectory {
             this.Process = new ProcessPrincipal(pc, pident);
         }
 
-        public DirectoryContext(ContextType ct, string name, string userName, string password) {
-            PrincipalContext pc = new PrincipalContext(ct, name, userName, password);
+        public DirectoryContext(string domain, string adContainer) {
+            PrincipalContext pc = new PrincipalContext(ContextType.Domain, domain, adContainer);
+            WindowsIdentity pident = WindowsIdentity.GetCurrent();
+            this.Process = new ProcessPrincipal(pc, pident);
+        }
+
+        public DirectoryContext(string domain, string userName, string password, bool localMachine) {
+            PrincipalContext pc = new PrincipalContext(localMachine ? ContextType.Machine : ContextType.Domain, domain, userName, password);
             WindowsIdentity pident = WindowsIdentity.GetCurrent();
             this.Process = new ProcessPrincipal(pc, pident);
         }
 
         public DirectoryContext(string domain, string userName, string password)
-            : this(ContextType.Domain, domain, userName, password) { }
+            : this(domain, userName, password, false) { }
 
         #endregion
 
@@ -88,11 +94,11 @@ namespace Awesome.Library.ActiveDirectory {
             return results.ToArray();
         }
 
-        #endregion
+            #endregion
 
-        #region " Static Methods "
+            #region " Static Methods "
 
-        public static T GetPropertyValue<T>(Principal p, string propertyName) {
+            public static T GetPropertyValue<T>(Principal p, string propertyName) {
             object value = DirectoryContext.GetPropertyValue(p, propertyName);
             if (value != null) {
                 return (T)value;
